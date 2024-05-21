@@ -2,10 +2,10 @@ from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain.vectorstores.chroma import Chroma
-from dotenv import load_dotenv
-from embedding.embeddings import create_embeddings_for_txt
+# from dotenv import load_dotenv
+from create_embeddings import create_embeddings_for_txt
 
-load_dotenv()
+# load_dotenv()
 
 create_embeddings_for_txt("123", "경제상식.txt")
 
