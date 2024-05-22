@@ -1,23 +1,9 @@
-from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-# from embedding.vector_stores.chromadb import vector_store
 from langchain.vectorstores.chroma import Chroma
+from langchain_community.document_loaders import TextLoader
 
-from embedding.vector_stores.chromadb import create_vector_store
 from embeddings.openai import embeddings
 
-# def create_embeddings_for_pdf(pdf_id: str, pdf_path: str):
-#     text_splitter = RecursiveCharacterTextSplitter(
-#         chunk_size=500,
-#         chunk_overlap=100
-#     )
-#
-#     loader = PyPDFLoader(pdf_path)
-#     docs = loader.load_and_split(text_splitter)
-#
-#     # print(docs)
-#     # vector_store.add_documents(docs)
-#     add_vector_store(docs, embeddings)
 
 def create_embeddings_for_txt(txt_id: str, txt_path: str):
     text_splitter = RecursiveCharacterTextSplitter(
@@ -27,12 +13,11 @@ def create_embeddings_for_txt(txt_id: str, txt_path: str):
     #
     loader = TextLoader(txt_path)
     docs = loader.load_and_split(text_splitter)
-    print(docs)
-    #
-    # vector_store.add_documents(docs)
+    # print(docs)
 
-    add_vector_store(docs, embeddings)
+    Chroma.from_documents(
+        docs,
+        embedding=embeddings,
+        persist_directory="emb"
+    )
 
-def add_vector_store(docs, embeddings):
-    create_vector_store(docs, embeddings)
-    # Chroma.from_documents(docs, embedding=embeddings, persist_directory="emb")
