@@ -30,6 +30,7 @@ redis = "==5.0.0"
 colorama = "*"
 #langchain-community = "==0.0.19"
 langchain-community = "==0.0.33"
+chromadb = "*"
 
 [dev-packages]
 
