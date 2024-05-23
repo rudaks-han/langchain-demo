@@ -28,3 +28,4 @@ def create_embeddings_for_pdf(pdf_id: str, pdf_path: str):
     #     print("\n")
 
     vector_store.add_documents(docs)
+    print("added docs to vector store")

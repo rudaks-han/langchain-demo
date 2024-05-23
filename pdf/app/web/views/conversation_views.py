@@ -44,6 +44,8 @@ def create_message(conversation):
 
     chat = build_chat(chat_args)
 
+    print(f'__________build_chat: {chat}')
+
     if not chat:
         return "Chat not yet implemented!"
 
