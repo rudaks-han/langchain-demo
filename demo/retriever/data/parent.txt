@@ -1,0 +1,311 @@
+react에서 form을 다루는 방법은 여러가지가 있고 어떤식으로 사용할 수 있는지 한번 알아보자.
+다음와 같은 로그인 form이 있다. 아주 간단한 양식이지만 react에서는 여러가지 방식으로 form을 사용할 수 있다.
+
+위 화면에는 Email과 password 필드가 있고 전송 버튼을 클릭할 때 일반적으로 해당 값으로 ajax를 통해 서버를 호출한다. 여기서는 서버로 요청하기 전에 해당 필드의 값을 어떻게 얻어낼 수 있는지에 대한 방법을 알아본다.
+사용가능한 방법은 아래와 같다.
+
+State와 Handler 사용하는 방법
+Ref를 사용하는 방법
+FormData와 브라우저 API 사용
+Custom Hook 사용하기
+React Forms Library 사용하기
+
+1. State와 Handler 사용하는 방법
+가장 기본적인 방법은 state와 onChange 이벤트를 활용하는 방법이다.
+export default function Login() {
+  const [loginInput, setLoginInput] = useState({
+    email: "",
+    password: "",
+  });
+
+  function handleInputChange(field, event) {
+    setLoginInput((prevState) => ({
+      ...prevState,
+      [field]: event.target.value,
+    }));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    console.log(loginInput);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+      <div className="control">
+        <label>Email</label>
+        <input
+          type="email"
+          onChange={(event) => handleInputChange("email", event)}
+          value={loginInput.email}
+        />
+      </div>
+      <div className="control">
+        <label>Password</label>
+        <input
+          type="password"
+          onChange={(event) => handleInputChange("password", event)}
+          value={loginInput.password}
+        />
+      </div>
+      <p>
+        <button type="submit">Submit</button>
+      </p>
+    </form>
+  );
+}
+입력값의 상태관리를 위해 loginInput을 useState로 관리하고 있다. 또한 onChange 이벤트 발생 시 각 필드의 상태 관리를 위해 handleInputChange를 통해 상태 변경을 하고 있다.
+이렇게 하여 Submit 버튼을 클릭하면 아래와 같은 로그가 표시된다.
+{"email": 'test@aa.aa', "password": '1111'}
+이렇게 state를 활용하여 기본적인 form의 값을 구해올 수 있다.
+2. Ref를 사용하는 방법
+두 번째 방법은 ref를 사용하는 방법이다. ref를 사용하면 state 및 onChange 이벤트가 필요가 없다. 단지 ref를 통해 접근하면 값을 얻어올 수 있다.
+export default function Login() {
+  const emailRef = useRef();
+  const passwordRef = useRef();
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    console.log("email: " + emailRef.current.value);
+    console.log("password: " + passwordRef.current.value);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+      <div className="control">
+        <label>Email</label>
+        <input type="email" ref={emailRef} />
+      </div>
+      <div className="control">
+        <label>Password</label>
+        <input type="password" ref={passwordRef} />
+      </div>
+      <p>
+        <button type="submit">Submit</button>
+      </p>
+    </form>
+  );
+}
+이 방법은 불필요한 state와 handler가 없어서 간단하게 사용할 수 있는 점이 있지만 단점은 form이 복잡할 때 모든 참조(useRef)를 가져야 한다는 것과 입력값을 초기화하기가 어렵다는 것이다.
+3. FormData와 브라우저 API 사용
+이 방법은 복잡한 form 구조를 다룰 때 사용하기가 좋다. 로그인은 2개의 필드로도 충분하지만 회원가입과 같은 경우 많은 입력필드로 인해 상태 및 이벤트 처리가 복잡하다.
+좀 더 복잡한 구조를 다루기 위해 회원가입과 같이 좀 더 많은 입력필드로 예제를 만들어보자.
+
+
+export default function Login() {
+  function handleSubmit(event) {
+    event.preventDefault();
+    ...
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Signup</h2>
+      <div className="control">
+        <label>Email</label>
+        <input type="email" name="email" />
+      </div>
+      <div className="control">
+        <label>Password</label>
+        <input type="password" name="password" />
+      </div>
+      <div className="control">
+        <label>Gender</label>
+        <select name="gender">
+          <option value="male">Male</option>
+          <option value="femail">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div className="control">
+        <label>Quantity</label>
+        <input type="radio" name="quantity" value="1" /> 1
+        <input type="radio" name="quantity" value="2" /> 2
+        <input type="radio" name="quantity" value="3" /> 3
+      </div>
+      <div className="control" name="terms">
+        <label>Terms</label>
+        <input type="checkbox" name="terms" value="Y" />
+        <span>I agree to the Terms and Conditions</span>
+      </div>
+      <p>
+        <button type="submit">Submit</button>
+      </p>
+    </form>
+  );
+}
+이전 로그인에 사용한 form 보다 더 많은 입력값이 포함되어 있다. 여기에서 state나 ref를 통해 각 필드에 연결하는 방식은 너무 비효율적인 방법이다. 그렇다면 이와 동일한 동작을 하는 네이티브의 내장된 기능을 사용해 보는 것을 고려해 볼 수 있다.
+이를 위해 브라우저에 내장된 기능인 FormData를 활용할 수 있다. 이것은 리액트의 기능이 아닌 브라우저 기능이다. FormData는 각 폼 요소의 값을 쉽게 얻을 수 있게 도와주는 객체이다. 값을 가져오려면 아래와 같이 event.target을 추가하면 된다.
+const formData = new FormData(event.target);
+이 방법이 제대로 동작하려면 폼의 입력값 속성에 name 필드가 있어야 한다. 그래서 모든 필드에 name 필드를 추가한다.
+그리고 값을 구해오기 위해 formData.get을 활용한다.
+const formData = new FormData(event.target);
+const email = formData.get("email");
+하지만 모든 필드값을 get으로 가져오면 지저분해진다. 그래서 간단하게 사용할 수 있는 방법은 Object.fromEntries()를 사용하는 것이다.
+const formData = new FormData(event.target);
+const data = Object.fromEntries(formData.entries());
+console.log(data);
+console.log를 통해 form에 입력된 값을 찍어보자.
+console.log에 찍힌 값
+{"email: '', password: '', gender: 'male'}
+하지만 email, password, gender값은 잘 표시되지만 quantity, terms는 표시되지 않는다.
+
+
+input, select는 제대로 표시가 되지만, 표시가 되지 않는 값은 checkbox와 radio이다. 이 두 가지 값은 값을 그룹핑하여 표시하는데 사용된다. 이 두 가지는 아래 방법으로 다시 가져올 수 있다.
+const genderData = formData.getAll("gender");
+const termsData = formData.getAll("terms");
+const data = Object.fromEntries(formData.entries());
+data.gender = genderData;
+data.terms = termsData;
+
+console.log(data);
+다시 data를 찍어보자.
+{'email': 'test@test.com', 'password': '1111', 'gender': ['male'], 'quantity': '1', 'terms': ['Y']}
+모든 값이 정상적으로 출력되는 것을 확인할 수 있다.
+4. Custom Hook 사용하기
+여러 개의 입력값 상태 및 반복되는 onChange 이벤트를 재사용하기 위해서는 어떻게 해야 할까? 커스텀 훅을 사용하면 된다.
+useInput.js라는 hook을 생성한다.
+export function useInput(defaultValue, validationFn) {
+  const [value, setValue] = useState(defaultValue);
+  const valueIsValid = validationFn(value);
+
+  function handleInputChange(event) {
+    setValue(event.target.value);
+  }
+
+  return {
+    value,
+    handleInputChange,
+    hasError: !valueIsValid,
+  };
+}
+여기에 입력필드의 기본값 (defaultValue), 검증 함수(validationFn)를 매개변수로 하는 useInput 훅을 만든다. 그리고 리턴값으로 입력된 값(value), onChange 함수(handleInputChange), 에러여부(hasError)를 리턴한다.
+그리고 실제 hook을 사용할 Login 페이지를 만든다.
+export default function Login() {
+  const {
+    value: emailValue,
+    handleInputChange: handleEmailChange,
+    hasError: emailHasError,
+  } = useInput("", (value) => value.includes("@"));
+
+  const {
+    value: passwordValue,
+    handleInputChange: handlePasswordChange,
+    hasError: passwordHasError,
+  } = useInput("", (value) => value.length >= 4);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    console.log(emailValue, passwordValue);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+      <div className="control">
+        <label>Email</label>
+        <input onChange={handleEmailChange} value={emailValue} />
+        {emailHasError && <p>Please enter a valid email</p>}
+      </div>
+      <div className="control">
+        <label>Password</label>
+        <input
+          type="password"
+          onChange={handlePasswordChange}
+          value={passwordValue}
+          error={passwordHasError && "Please enter a valid password"}
+        />
+      </div>
+      <p>
+        <button type="submit">Submit</button>
+      </p>
+    </form>
+  );
+}
+5. React Forms Library 사용하기
+마지막으로 3rd party 라이브러리를 사용하여 form을 사용할 수 있다. form을 처리하기 위해 처음부터 개발하지 않고 기존 라이브러리를 이용해서 손쉽게 사용할 수 있다.
+무수히 많은 라이브러리가 있지만 여기서는 두 가지 정도만 사용법을 소개한다.
+1) react hook forms
+설치
+npm install react-hook-form
+사용방법
+export default function Login() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  return (
+    <form onSubmit={handleSubmit((data) => console.log(data))}>
+      <h2>Login</h2>
+      <div className="control">
+        <label>Email</label>
+        <input {...register("email", { required: true })} />
+        {errors.email && <p>Email is required.</p>}
+      </div>
+      <div className="control">
+        <label>Password</label>
+        <input type="password" {...register("password", { required: true })} />
+        {errors.password && <p>Password is required.</p>}
+      </div>
+      <p>
+        <button type="submit">Submit</button>
+      </p>
+    </form>
+  );
+}
+useForm의 사용방법이다. useForm은 상태와 validation을 관리하기 위해 사용된다.
+register 함수는 form의 입력필드를 등록하기 위해 사용되고 각 필드의 props를 리턴한다. handleSubmit 함수는 onSubmit을 넘기며 form 전송을 처리하기 위해 사용된다.
+2) Formik
+설치
+npm install formik
+사용방법
+export default function Login() {
+  return (
+    <Formik
+      initialValues={{ email: "", password: "" }}
+      validate={(values) => {
+        const errors = {};
+        if (!values.email) {
+          errors.email = "Required";
+        } else if (
+          !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+        ) {
+          errors.email = "Invalid email address";
+        }
+        return errors;
+      }}
+      onSubmit={(values, { setSubmitting }) => {
+        setTimeout(() => {
+          console.log(values);
+          setSubmitting(false);
+        }, 100);
+      }}
+    >
+      {({ isSubmitting }) => (
+        <Form>
+          <h2>Login</h2>
+          <div className="control">
+            <label>Email</label>
+            <Field type="email" name="email" />
+            <ErrorMessage name="email" component="div" />
+          </div>
+          <div className="control">
+            <label>Password</label>
+            <Field type="password" name="password" />
+            <ErrorMessage name="password" component="div" />
+          </div>
+          <p>
+            <button type="submit" disabled={isSubmitting}>
+              Submit
+            </button>
+          </p>
+        </Form>
+      )}
+    </Formik>
+  );
+}
+initialValues prop은 form 입력값의 초기값을 정의하고 validate 함수는 form validation에 사용된다. onSubmit 함수는 form이 submit되었을 때 수행된다.
