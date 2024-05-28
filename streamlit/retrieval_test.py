@@ -15,11 +15,13 @@ load_dotenv()
 
 if __name__ == "__main__":
     # question = "누가 벌금을 가장 많이 냈어?"
-    question = "선수별 특징 알려줘"
+    question = "전적결과 분석해줘"
     llm = ChatOpenAI()
     embeddings = OpenAIEmbeddings()
 
     info = """System: Use the following pieces of context to answer the user's question.
+답변은 한국어로 해줘
+
 규칙:
 - 11점을 내면 경기 끝남.
 - 진팀에서 0점이면 10000원, 1~3점이면 2000원, 4~6점이면 1000원을 벌금으로 냄
