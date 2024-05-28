@@ -11,6 +11,11 @@ langchain-community = "==0.0.33"
 python-dotenv = "==1.0.0"
 tiktoken = "*"
 chromadb = "*"
+streamlit = "*"
+langchain-google-community = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
 
 [dev-packages]
 
