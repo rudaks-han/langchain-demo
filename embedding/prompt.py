@@ -3,7 +3,9 @@ from langchain.chains import RetrievalQA
 from langchain_openai.chat_models import ChatOpenAI
 from langchain.vectorstores.chroma import Chroma
 from dotenv import load_dotenv
+import langchain
 
+langchain.debug = True
 load_dotenv()
 
 chat = ChatOpenAI()
@@ -20,6 +22,9 @@ chain = RetrievalQA.from_chain_type(
     retriever=retriever,
     chain_type="stuff"
 )
+
+print('[chain]')
+print(chain)
 
 result = chain.invoke("물가상승률을 고려하지 않은 금리이며 은행에서 제시하는 금리를 뭐라고 하나?")
 

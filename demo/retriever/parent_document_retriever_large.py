@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from langchain.storage import InMemoryStore
+from langchain.storage import InMemoryStore, LocalFileStore, create_kv_docstore
 from langchain_community.document_loaders import TextLoader
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
@@ -11,8 +11,6 @@ langchain.debug = True
 load_dotenv()
 
 loaders = [
-    # 파일을 로드합니다.
-    # 파일을 로드합니다.
     TextLoader("./data/보험약관.txt"),
 ]
 docs = []  # 빈 리스트를 생성합니다.
@@ -21,25 +19,29 @@ for loader in loaders:  # loaders 리스트의 각 로더에 대해 반복합니
         loader.load()
     )  # 로더를 사용하여 문서를 로드하고 docs 리스트에 추가합니다.
 
+parent_splitter = RecursiveCharacterTextSplitter(chunk_size=900)
 # 자식 분할기를 생성합니다.
-child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
+child_splitter = RecursiveCharacterTextSplitter(chunk_size=300)
 
 # DB를 생성합니다.
 vectorstore = Chroma(
-    collection_name="full_documents", embedding_function=OpenAIEmbeddings()
+    collection_name="split_parents", embedding_function=OpenAIEmbeddings()
 )
 
 store = InMemoryStore()
+fs = LocalFileStore(root_path="./file_store")
+store = create_kv_docstore(fs)
 
 # Retriever 를 생성합니다.
 retriever = ParentDocumentRetriever(
     vectorstore=vectorstore,
     docstore=store,
     child_splitter=child_splitter,
+    parent_splitter=parent_splitter
 )
 
 # 문서를 검색기에 추가합니다. docs는 문서 목록이고, ids는 문서의 고유 식별자 목록입니다.
-retriever.add_documents(docs, ids=None, add_to_docstore=True)
+retriever.add_documents(docs)
 
 # 저장소의 모든 키를 리스트로 반환합니다.
 list(store.yield_keys())
