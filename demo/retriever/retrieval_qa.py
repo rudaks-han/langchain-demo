@@ -26,5 +26,5 @@ if __name__ == "__main__":
         chain_type="stuff"
     )
 
-    result = chain.invoke("Python은 무엇인가?")
+    result = chain.invoke("주식 시장이란 무엇인가?")
     print(result)

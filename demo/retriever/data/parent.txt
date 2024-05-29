@@ -1,311 +1,392 @@
-react에서 form을 다루는 방법은 여러가지가 있고 어떤식으로 사용할 수 있는지 한번 알아보자.
-다음와 같은 로그인 form이 있다. 아주 간단한 양식이지만 react에서는 여러가지 방식으로 form을 사용할 수 있다.
+하나손해보험
+하나손해보험 상품의 이름은 원데이자동차보험이에요. 나이는 만 20세 이상이면 가입할 수 있어요. 가입 기간은 1~7일이에요. 하나손해보험의 특징은 무보험자동차에 의한 상해를 보장해준다는 점이에요. 다른 보험사의 상품은 무보험자동차에 의한 상해를 보장해주지 않아요. 상세한 보장 내용과 보험료는 표로 정리해드릴게요!
 
-위 화면에는 Email과 password 필드가 있고 전송 버튼을 클릭할 때 일반적으로 해당 값으로 ajax를 통해 서버를 호출한다. 여기서는 서버로 요청하기 전에 해당 필드의 값을 어떻게 얻어낼 수 있는지에 대한 방법을 알아본다.
-사용가능한 방법은 아래와 같다.
+ 	종합형	기본형	최소형	차량손해보장형
+대인배상	
+무한
+무한
+무한
+X
+대물배상	
+1억원
+1억원
+1억원
+X
+자기신체사고	
+3천만원
+3천만원
+3천만원
+X
+타인자동차손해	
+3천만원
 
-State와 Handler 사용하는 방법
-Ref를 사용하는 방법
-FormData와 브라우저 API 사용
-Custom Hook 사용하기
-React Forms Library 사용하기
+(30만원 공제)
 
-1. State와 Handler 사용하는 방법
-가장 기본적인 방법은 state와 onChange 이벤트를 활용하는 방법이다.
-export default function Login() {
-  const [loginInput, setLoginInput] = useState({
-    email: "",
-    password: "",
-  });
+3천만원
 
-  function handleInputChange(field, event) {
-    setLoginInput((prevState) => ({
-      ...prevState,
-      [field]: event.target.value,
-    }));
-  }
+(30만원 공제)
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    console.log(loginInput);
-  }
+X
+3천만원
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <div className="control">
-        <label>Email</label>
-        <input
-          type="email"
-          onChange={(event) => handleInputChange("email", event)}
-          value={loginInput.email}
-        />
-      </div>
-      <div className="control">
-        <label>Password</label>
-        <input
-          type="password"
-          onChange={(event) => handleInputChange("password", event)}
-          value={loginInput.password}
-        />
-      </div>
-      <p>
-        <button type="submit">Submit</button>
-      </p>
-    </form>
-  );
-}
-입력값의 상태관리를 위해 loginInput을 useState로 관리하고 있다. 또한 onChange 이벤트 발생 시 각 필드의 상태 관리를 위해 handleInputChange를 통해 상태 변경을 하고 있다.
-이렇게 하여 Submit 버튼을 클릭하면 아래와 같은 로그가 표시된다.
-{"email": 'test@aa.aa', "password": '1111'}
-이렇게 state를 활용하여 기본적인 form의 값을 구해올 수 있다.
-2. Ref를 사용하는 방법
-두 번째 방법은 ref를 사용하는 방법이다. ref를 사용하면 state 및 onChange 이벤트가 필요가 없다. 단지 ref를 통해 접근하면 값을 얻어올 수 있다.
-export default function Login() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
+(30만원 공제)
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    console.log("email: " + emailRef.current.value);
-    console.log("password: " + passwordRef.current.value);
-  }
+대인I지원금특약	
+가입
+X
+X
+X
+법률비용지원금	
+가입
+X
+X
+X
+무보험자동차에 의한 상해	
+2억원
+X
+X
+X
+보험료	
+11,140원
+8,710원
+6,730원
+1,980원
+DB손해보험
+DB손해보험 상품의 이름은 원데이자동차보험이에요. 나이는 만 21세 이상이면 가입할 수 있어요. 가입 기간은 1~7일이에요. 보장 내용과 보험료는 표로 정리해드릴게요!
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <div className="control">
-        <label>Email</label>
-        <input type="email" ref={emailRef} />
-      </div>
-      <div className="control">
-        <label>Password</label>
-        <input type="password" ref={passwordRef} />
-      </div>
-      <p>
-        <button type="submit">Submit</button>
-      </p>
-    </form>
-  );
-}
-이 방법은 불필요한 state와 handler가 없어서 간단하게 사용할 수 있는 점이 있지만 단점은 form이 복잡할 때 모든 참조(useRef)를 가져야 한다는 것과 입력값을 초기화하기가 어렵다는 것이다.
-3. FormData와 브라우저 API 사용
-이 방법은 복잡한 form 구조를 다룰 때 사용하기가 좋다. 로그인은 2개의 필드로도 충분하지만 회원가입과 같은 경우 많은 입력필드로 인해 상태 및 이벤트 처리가 복잡하다.
-좀 더 복잡한 구조를 다루기 위해 회원가입과 같이 좀 더 많은 입력필드로 예제를 만들어보자.
+ 	고급형	기본형	실속형
+대인배상	
+무한
+무한
+무한
+대물배상	
+1억원
+3천만원
+2천만원
+자기신체사고	
+1억원
+3천만원
+3천만원
+타인자동차손해	
+5천만원
 
+(20만원 공제)
 
-export default function Login() {
-  function handleSubmit(event) {
-    event.preventDefault();
-    ...
-  }
+3천만원
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h2>Signup</h2>
-      <div className="control">
-        <label>Email</label>
-        <input type="email" name="email" />
-      </div>
-      <div className="control">
-        <label>Password</label>
-        <input type="password" name="password" />
-      </div>
-      <div className="control">
-        <label>Gender</label>
-        <select name="gender">
-          <option value="male">Male</option>
-          <option value="femail">Female</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div className="control">
-        <label>Quantity</label>
-        <input type="radio" name="quantity" value="1" /> 1
-        <input type="radio" name="quantity" value="2" /> 2
-        <input type="radio" name="quantity" value="3" /> 3
-      </div>
-      <div className="control" name="terms">
-        <label>Terms</label>
-        <input type="checkbox" name="terms" value="Y" />
-        <span>I agree to the Terms and Conditions</span>
-      </div>
-      <p>
-        <button type="submit">Submit</button>
-      </p>
-    </form>
-  );
-}
-이전 로그인에 사용한 form 보다 더 많은 입력값이 포함되어 있다. 여기에서 state나 ref를 통해 각 필드에 연결하는 방식은 너무 비효율적인 방법이다. 그렇다면 이와 동일한 동작을 하는 네이티브의 내장된 기능을 사용해 보는 것을 고려해 볼 수 있다.
-이를 위해 브라우저에 내장된 기능인 FormData를 활용할 수 있다. 이것은 리액트의 기능이 아닌 브라우저 기능이다. FormData는 각 폼 요소의 값을 쉽게 얻을 수 있게 도와주는 객체이다. 값을 가져오려면 아래와 같이 event.target을 추가하면 된다.
-const formData = new FormData(event.target);
-이 방법이 제대로 동작하려면 폼의 입력값 속성에 name 필드가 있어야 한다. 그래서 모든 필드에 name 필드를 추가한다.
-그리고 값을 구해오기 위해 formData.get을 활용한다.
-const formData = new FormData(event.target);
-const email = formData.get("email");
-하지만 모든 필드값을 get으로 가져오면 지저분해진다. 그래서 간단하게 사용할 수 있는 방법은 Object.fromEntries()를 사용하는 것이다.
-const formData = new FormData(event.target);
-const data = Object.fromEntries(formData.entries());
-console.log(data);
-console.log를 통해 form에 입력된 값을 찍어보자.
-console.log에 찍힌 값
-{"email: '', password: '', gender: 'male'}
-하지만 email, password, gender값은 잘 표시되지만 quantity, terms는 표시되지 않는다.
+(50만원 공제)
 
+1천만원
 
-input, select는 제대로 표시가 되지만, 표시가 되지 않는 값은 checkbox와 radio이다. 이 두 가지 값은 값을 그룹핑하여 표시하는데 사용된다. 이 두 가지는 아래 방법으로 다시 가져올 수 있다.
-const genderData = formData.getAll("gender");
-const termsData = formData.getAll("terms");
-const data = Object.fromEntries(formData.entries());
-data.gender = genderData;
-data.terms = termsData;
+(50만원 공제)
 
-console.log(data);
-다시 data를 찍어보자.
-{'email': 'test@test.com', 'password': '1111', 'gender': ['male'], 'quantity': '1', 'terms': ['Y']}
-모든 값이 정상적으로 출력되는 것을 확인할 수 있다.
-4. Custom Hook 사용하기
-여러 개의 입력값 상태 및 반복되는 onChange 이벤트를 재사용하기 위해서는 어떻게 해야 할까? 커스텀 훅을 사용하면 된다.
-useInput.js라는 hook을 생성한다.
-export function useInput(defaultValue, validationFn) {
-  const [value, setValue] = useState(defaultValue);
-  const valueIsValid = validationFn(value);
+대인I지원금특약	
+가입
+가입
+가입
+법률비용지원금	
+고급형
+기본형
+X
+보험료	
+10,930원
+9,220원
+6,890원
+KB손해보험
+KB손해보험 상품의 이름은 하루자동차보험이에요. 나이에 대한 언급은 없지만 만 24세 이상이어야 통과될 가능성이 높다고 합니다. 직접 신청해보시는 것도 방법일 수 있어요. 가입 기간은 1~7일이에요. 상세한 보장 내용과 보험료는 표로 정리해드릴게요!
 
-  function handleInputChange(event) {
-    setValue(event.target.value);
-  }
+ 	최고급형	고급형	기본형
+대인배상	
+무한
+무한
+무한
+대물배상	
+3천만원
+3천만원
+2천만원
+자기신체사고	
+3천만원
+3천만원
+3천만원
+타인자동차손해	
+3천만원
 
-  return {
-    value,
-    handleInputChange,
-    hasError: !valueIsValid,
-  };
-}
-여기에 입력필드의 기본값 (defaultValue), 검증 함수(validationFn)를 매개변수로 하는 useInput 훅을 만든다. 그리고 리턴값으로 입력된 값(value), onChange 함수(handleInputChange), 에러여부(hasError)를 리턴한다.
-그리고 실제 hook을 사용할 Login 페이지를 만든다.
-export default function Login() {
-  const {
-    value: emailValue,
-    handleInputChange: handleEmailChange,
-    hasError: emailHasError,
-  } = useInput("", (value) => value.includes("@"));
+(50만원 공제)
 
-  const {
-    value: passwordValue,
-    handleInputChange: handlePasswordChange,
-    hasError: passwordHasError,
-  } = useInput("", (value) => value.length >= 4);
+3천만원
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    console.log(emailValue, passwordValue);
-  }
+(50만원 공제)
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <div className="control">
-        <label>Email</label>
-        <input onChange={handleEmailChange} value={emailValue} />
-        {emailHasError && <p>Please enter a valid email</p>}
-      </div>
-      <div className="control">
-        <label>Password</label>
-        <input
-          type="password"
-          onChange={handlePasswordChange}
-          value={passwordValue}
-          error={passwordHasError && "Please enter a valid password"}
-        />
-      </div>
-      <p>
-        <button type="submit">Submit</button>
-      </p>
-    </form>
-  );
-}
-5. React Forms Library 사용하기
-마지막으로 3rd party 라이브러리를 사용하여 form을 사용할 수 있다. form을 처리하기 위해 처음부터 개발하지 않고 기존 라이브러리를 이용해서 손쉽게 사용할 수 있다.
-무수히 많은 라이브러리가 있지만 여기서는 두 가지 정도만 사용법을 소개한다.
-1) react hook forms
-설치
-npm install react-hook-form
-사용방법
-export default function Login() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+1천만원
 
-  return (
-    <form onSubmit={handleSubmit((data) => console.log(data))}>
-      <h2>Login</h2>
-      <div className="control">
-        <label>Email</label>
-        <input {...register("email", { required: true })} />
-        {errors.email && <p>Email is required.</p>}
-      </div>
-      <div className="control">
-        <label>Password</label>
-        <input type="password" {...register("password", { required: true })} />
-        {errors.password && <p>Password is required.</p>}
-      </div>
-      <p>
-        <button type="submit">Submit</button>
-      </p>
-    </form>
-  );
-}
-useForm의 사용방법이다. useForm은 상태와 validation을 관리하기 위해 사용된다.
-register 함수는 form의 입력필드를 등록하기 위해 사용되고 각 필드의 props를 리턴한다. handleSubmit 함수는 onSubmit을 넘기며 form 전송을 처리하기 위해 사용된다.
-2) Formik
-설치
-npm install formik
-사용방법
-export default function Login() {
-  return (
-    <Formik
-      initialValues={{ email: "", password: "" }}
-      validate={(values) => {
-        const errors = {};
-        if (!values.email) {
-          errors.email = "Required";
-        } else if (
-          !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-        ) {
-          errors.email = "Invalid email address";
-        }
-        return errors;
-      }}
-      onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          console.log(values);
-          setSubmitting(false);
-        }, 100);
-      }}
-    >
-      {({ isSubmitting }) => (
-        <Form>
-          <h2>Login</h2>
-          <div className="control">
-            <label>Email</label>
-            <Field type="email" name="email" />
-            <ErrorMessage name="email" component="div" />
-          </div>
-          <div className="control">
-            <label>Password</label>
-            <Field type="password" name="password" />
-            <ErrorMessage name="password" component="div" />
-          </div>
-          <p>
-            <button type="submit" disabled={isSubmitting}>
-              Submit
-            </button>
-          </p>
-        </Form>
-      )}
-    </Formik>
-  );
-}
-initialValues prop은 form 입력값의 초기값을 정의하고 validate 함수는 form validation에 사용된다. onSubmit 함수는 form이 submit되었을 때 수행된다.
+(50만원 공제)
+
+대인I지원금특약	
+가입
+가입
+가입
+법률비용지원금	
+X
+X
+X
+보험료	
+16,520원
+13,100원
+9,750원
+롯데손해보험
+롯데손해보험의 이름은 원데이자동차보험이에요. 나이는 만 24세 이상이면 가입할 수 있어요. 가입 기간은 1~7일이에요. 자세한 보장 내용과 보험료는 표로 정리해드릴게요!
+
+ 	종합형	기본형
+대인배상	
+무한
+무한
+대물배상	
+3천만원
+1억원
+자기신체사고	
+3천만원
+3천만원
+타인자동차손해	
+3천만원
+
+(50만원 공제)
+
+X
+대인I지원금특약	
+가입
+X
+법률비용지원금	
+X
+X
+보험료	
+9,060원
+5,570원
+삼성화재
+삼성화재 상품의 이름은 원데이 애니카 자동차보험이에요. 나이는 만 21세 이상이면 가입할 수 있어요. 가입 기간은 1~7일이에요. 자세한 보장 내용과 보험료는 표로 정리해드릴게요!
+
+ 	고급플랜	기본플랜
+대인배상	
+무한
+무한
+대물배상	
+3천만원
+3천만원
+자기신체사고	
+3천만원
+3천만원
+타인자동차손해	
+3천만원
+
+(50만원 공제)
+
+X
+대인I지원금특약	
+가입
+X
+법률비용지원금	
+가입
+가입
+보험료	
+12,530원
+8,410원
+현대해상
+현대해상상품의 이름은 타임쉐어 자동차보험이에요. 나이는 만 26세 이상이면 가입할 수 있어요. 가입 기간은 6시간~10일이고 다른 상품과 다르게 시간 단위로 기간을 정할 수 있어요. 그리고 자동차상해와 자기신체사고 중 선택할 수 있어요. 보험사에 미리 제시하는 번들이 없기 때문에 보장종목과 특약에 대해서 자유롭게 선택할 수 있어요. 자세한 보장 내용과 보험료는 표로 정리해드릴게요!
+
+ 	기본
+대인배상	
+무한
+대물배상	
+3천만원
+자동차상해
+
+자기신체사고
+
+1억원
+
+3천만원
+
+타인자동차손해	
+3천만원
+
+(50만원 공제)
+
+대인I지원금특약	
+가입
+법률비용지원금	
+가입
+보험료	
+17,770원
+한화손해보험
+한화손해보험의 이름은 원데이 자동차 보험이에요. 나이는 만 26세 이상이면 가입할 수 있어요. 가입 기간은 1~7일이에요. 그리고 자동차상해와 자기신체사고 중 선택할 수 있어요. 자세한 보장 내용과 보험료는 표로 정리해드릴게요!
+
+ 	고급	표준
+대인배상	
+무한
+무한
+대물배상	
+1억원
+1억원
+자동차상해
+
+자기신체사고
+
+1억원
+
+X
+
+X
+
+3천만원
+
+타인자동차손해	
+3천만원
+
+(50만원 공제)
+
+X
+대인I지원금특약	
+가입
+가입
+법률비용지원금	
+가입
+X
+보험료	
+11,460원
+9,450원
+모든 원데이자동차보험 보장 및 가격 비교
+각 보험사의 원데이자동차보험에 대해서 알아봤으니 보험사간 원데이자동차보험을 비교해보겠습니다. 비교의 형평성을 위해서 제일 높은 보장을 제공하는 번들로 비교하겠습니다.
+
+ 	하나손해보험	DB손해보험	KB손해보험	롯데손해보험	삼성화재	현대해상	한화손해보험
+가입 나이	
+20세
+21세
+24세
+24세
+21세
+26세
+26세
+대인배상	
+무한
+무한
+무한
+무한
+무한
+무한
+무한
+대물배상	
+1억원
+1억원
+3천만원
+3천만원
+3천만원
+3천만원
+1억원
+자동차상해
+
+자기신체사고
+
+X
+
+3천만원
+
+X
+
+1억원
+
+X
+
+3천만원
+
+X
+
+3천만원
+
+X
+
+3천만원
+
+1억원
+
+3천만원
+
+1억원
+
+X
+
+타인자동차손해	
+3천만원
+
+(30만원 공제)
+
+5천만원
+
+(20만원 공제)
+
+3천만원
+
+(50만원 공제)
+
+3천만원
+
+(50만원 공제)
+
+3천만원
+
+(50만원 공제)
+
+3천만원
+
+(50만원 공제)
+
+3천만원
+
+(50만원 공제)
+
+대인I지원금특약	
+가입
+가입
+가입
+가입
+가입
+가입
+가입
+법률비용지원금	
+가입
+고급형
+X
+X
+가입
+가입
+가입
+무보험자동차에 의한 상해	
+2억원
+X
+X
+X
+X
+X
+X
+보험료	
+11,140원
+10,930원
+16,520원
+9,060원
+12,530원
+17,770원
+11,460원
+대인배상, 대인I 지원금 특약은 7개 보험사가 동일합니다. 대물배상은 하나손해보험과 DB손해보험의 보장금액이 커요. 자기신체사고는 DB손해보험이 가장 큽니다. 현대해상과 한화손해보험에서 유일하게 자동차상해를 고를 수 있고 금액도 1억원으로 동일해요. 타인 자동차손해는 DB손해보험이 제일 큽니다. 법률비용지원금은 KB손해보험과 롯데손해보험만 없어요. 무보험자동차에 의한 상해는 하나손해보험만 보장해줘요.
+
+원데이자동차보험 추천 대상
+제일 저렴하면서 제일 많은 보장 금액을 받고 싶으시다면 DB손해보험을 추천드려요.
+무보험자동차에 의한 상해를 보장 받고 싶다면 하나손해보험을 추천 드려요.
+주어진 번들 없이 선택하고 싶으시다면 현대해상을 추천드립니다!
+ 
+ 
+
+오늘은 가입 가능한 원데이자동차보험을 모두 비교해봤어요. 가입 나이부터 보험료까지 모든 정보를 표로 정리해드렸습니다. 각 보험사의 표와 추천 대상을 보시고 필요에 맞는 원데이자동차보험을 골라보세요!
+
+ 
+
+*상기 내용은 뱅크샐러드의 의견이며, 계약체결에 따른 이익 또는 손실은 보험계약자 및 피보험자에게 귀속됩니다.
+*본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의필로부터 1년입니다.
+*뱅크샐러드 심의필2024-0039(2024.02.13~2025.02.12)
