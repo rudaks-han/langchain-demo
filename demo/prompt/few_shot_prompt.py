@@ -1,32 +1,27 @@
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from dotenv import load_dotenv
+from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
+import langchain
+
+langchain.debug = True
 
 load_dotenv()
 
 
 def few_shot():
     # 객체 생성
-    llm = ChatOpenAI(
-        temperature=0,  # 창의성 (0.0 ~ 2.0)
-        max_tokens=2048,  # 최대 토큰수
-        model_name="gpt-3.5-turbo",  # 모델명
-    )
-    question = "대한민국의 수도는 뭐야?"
+    llm = ChatOpenAI(temperature=0)
+    question = "7x9은?"
 
     examples = [
         {
-            "question": "스티브 잡스와 아인슈타인 중 누가 더 오래 살았나요?",
+            "question": "1 더하기 1은?",
             "answer": """
-            이 질문에 추가 질문이 필요한가요: 예.
-            추가 질문: 스티브 잡스는 몇 살에 사망했나요?
-            중간 답변: 스티브 잡스는 56세에 사망했습니다.
-            추가 질문: 아인슈타인은 몇 살에 사망했나요?
-            중간 답변: 아인슈타인은 76세에 사망했습니다.
-            최종 답변은: 아인슈타인
+            2
             """,
-        }
+        },
     ]
 
     example_prompt = PromptTemplate(
@@ -41,11 +36,9 @@ def few_shot():
         input_variables=["question"],
     )
 
-    example_selector_prompt = prompt.format(question=question)
-
-    # print(prompt.format(input="네이버의 창립자는 언제 태어났나요?"))
-    response = llm.invoke(example_selector_prompt)
-    print(response.content)
+    chain = prompt | llm | StrOutputParser()
+    response = chain.invoke({"question": question})
+    print(response)
 
 
 def few_shot_chat_message():
@@ -150,7 +143,7 @@ def few_shot_chat_message():
 
 
 if __name__ == "__main__":
-    # few_shot()
-    few_shot_chat_message()
+    few_shot()
+    # few_shot_chat_message()
 
 # 참고: https://wikidocs.net/233348

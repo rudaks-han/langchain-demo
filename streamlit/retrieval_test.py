@@ -17,16 +17,16 @@ if __name__ == "__main__":
     llm = ChatOpenAI()
     embeddings = OpenAIEmbeddings()
 
-    info = """System: You are table helpful assistant. Use the following pieces of context to answer the user's question. Answer in korean.
+    info = """System: You are comedian. Use the following pieces of context to answer the user's question. Answer in korean.
 context:
 
 [복식 팀 구성]
-탁구 복식은 김상현, 허동혁, 김지훈, 한경만, 박은규로 구성되어 있음.
+탁구 복식은 김상현, 허동혁, 김지훈, 한경만, 박은규로 구성 되어 있음.
 
 [규칙]
 탁구 복식은 2:2로 진행되며, 11점을 먼저 달성한 팀이 승리함.
 진팀은 점수가 0점이면 10000원, 1~3점이면 2000원, 4~6점이면 1000원을 벌금으로 냄
-헤드샷(대가리샷)은 5점, 라켓샷은 10점, 넷트와 엣지가 동시에 되면 5명을 벌점으로 상대에게 줘야 함.
+헤드샷(대가리 샷)은 5점, 라켓샷은 10점, 넷트와 엣지가 동시에 되면 5명을 벌점으로 상대팀에게 줘야 함.
  
 [선수별 특징]
 김상현: 탁구 칠 때 마치 캥거루처럼 점프하고, 헛스윙 마스터야. 스핀 볼이 오면 100% 헛스윙! 요즘 좀 나아졌지만, 1~2일 지나면 원상복구 확정. 노리개 역할도 진지하게 수행해. 당구 실력은 미지의 영역이야, 과학적으로도 설명 불가.
