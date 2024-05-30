@@ -1,12 +1,11 @@
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import (
-    CharacterTextSplitter,
     RecursiveCharacterTextSplitter,
 )
 
 
 def split_text():
-    loader = TextLoader("sample.txt")
+    loader = TextLoader("data/sample.txt")
     document = loader.load()
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=20, chunk_overlap=0)

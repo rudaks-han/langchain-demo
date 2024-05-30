@@ -3,7 +3,7 @@ from langchain_text_splitters import CharacterTextSplitter
 
 
 def split_text():
-    loader = TextLoader("sample.txt")
+    loader = TextLoader("data/sample.txt")
     document = loader.load()
 
     text_splitter = CharacterTextSplitter(chunk_size=8, chunk_overlap=0)

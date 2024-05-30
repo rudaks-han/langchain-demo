@@ -18,6 +18,11 @@ langchainhub = "*"
 langchain-google-genai = "*"
 pillow = "*"
 networkx = "*"
+faiss-cpu = "*"
+beautifulsoup4 = "*"
+datasets = "*"
+langchain-text-splitters = "*"
+sentence-transformers = "*"
 
 [dev-packages]
 
