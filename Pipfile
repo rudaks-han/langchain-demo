@@ -15,6 +15,9 @@ streamlit = "*"
 langchain-google-community = "*"
 gspread = "*"
 langchainhub = "*"
+langchain-google-genai = "*"
+pillow = "*"
+networkx = "*"
 
 [dev-packages]
 
